@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
         `Email:  ${email || '-'}`,
         `Notes:  ${notes || '-'}`,
         ``,
-        `Manage bookings: https://www.catchmarrakech.com/admin`,
+        `Manage bookings: https://www.catchmarrakech.com/bookings`,
       ].join('\n')
     );
 

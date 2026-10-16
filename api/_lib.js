@@ -78,9 +78,9 @@ function newRef() {
   return 'C-' + s;
 }
 
-// Admin check: header "x-admin-key" must equal ADMIN_PASSWORD.
+// Staff check: header "x-admin-key" must equal BOOKINGS_PASSWORD (ADMIN_PASSWORD still accepted as fallback).
 function isAdmin(req) {
-  const pass = process.env.ADMIN_PASSWORD;
+  const pass = process.env.BOOKINGS_PASSWORD || process.env.ADMIN_PASSWORD;
   if (!pass) return null; // not configured
   const given = String(req.headers['x-admin-key'] || '');
   const a = crypto.createHash('sha256').update(given).digest();
