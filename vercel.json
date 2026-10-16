@@ -1,7 +1,10 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/admin", "destination": "/bookings", "permanent": false }
+  ],
   "headers": [
-    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/bookings", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/api/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
   ]
 }
