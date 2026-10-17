@@ -240,13 +240,13 @@
   var HOURS_PER_DAY = 8;
 
   // ---------------- state ----------------
-  var FDEF = { sales: { scope: "month", sort: "date" }, costs: { q: "", cat: "", st: "", scope: "month" }, credits: { q: "", st: "open" } };
+  var FDEF = { sales: { scope: "month", sort: "date" }, costs: { q: "", cat: "", st: "", scope: "month" }, credits: { q: "", st: "open" }, clients: { q: "", st: "" } };
   var S = {
     month: monthOf(todayStr()), tab: "dash", role: "loading",
     sales: {}, costs: [], credits: [], staff: [], ev: [], paid: {},
     f: JSON.parse(JSON.stringify(FDEF)),
     confirm: null, payCost: null, payCredit: null, editStaff: null, person: null, addStaff: false,
-    bk: {}
+    bk: {}, guests: {}, visits: [], resAll: [], profiles: [], myRole: null, guestOpen: null
   };
   var CFG = null, sb = null, channel = null, user = null;
 
@@ -257,7 +257,9 @@
     { id: "credits", label: "Crédits" },
     { id: "staff", label: "Personnel" },
     { id: "resa", label: "Réservations" },
-    { id: "stats", label: "Statistiques" }
+    { id: "clients", label: "Clients" },
+    { id: "stats", label: "Statistiques" },
+    { id: "team", label: "Équipe" }
   ];
 
   // ---------------- computations ----------------
@@ -297,7 +299,7 @@
     var n = labels.length, totals = labels.map(function (_, i) { return series.reduce(function (t, s) { return t + (+s.values[i] || 0); }, 0); });
     var max = Math.max.apply(null, totals.concat([0]));
     if (!max) return '<p class="empty">' + (opt.empty || "Aucune donnée.") + "</p>";
-    var W = 720, H = opt.h || 220, L = 52, R = 8, T = 10, B = 24, cw = (W - L - R) / n, top = niceTop(max);
+    var W = 720, H = opt.h || 220, L = 52, R = 8, T = 10, B = 24, cw = (W - L - R) / n, top = Math.max(4, niceTop(max));
     var y = function (v) { return T + (H - T - B) * (1 - v / top); };
     var fmt = opt.fmt || function (v) { return nf0.format(v); };
     var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(opt.label || "Graphique") + '">';
@@ -348,12 +350,9 @@
     var k = bkKey(from, to);
     S.bk[k] = Object.assign({}, S.bk[k] || {}, { loading: true, at: Date.now() });
     try {
-      var ses = (await sb.auth.getSession()).data.session;
-      if (!ses) throw new Error("Session expirée");
-      var r = await fetch("/api/stats?from=" + from + "&to=" + to, { headers: { Authorization: "Bearer " + ses.access_token }, cache: "no-store" });
-      var j = await r.json().catch(function () { return {}; });
-      if (!r.ok) throw new Error(j.error || ("Erreur " + r.status));
-      S.bk[k] = { items: j.items || [], at: Date.now() };
+      var res = await pageAll("reservations", "date,time,guests,status", function (q) { return q.gte("date", from).lte("date", to); });
+      if (res.error) throw res.error;
+      S.bk[k] = { items: res.data, at: Date.now() };
     } catch (e) {
       S.bk[k] = { error: e.message || String(e), items: (S.bk[k] && S.bk[k].items) || null, at: Date.now() };
     }
@@ -392,15 +391,16 @@
     $("#mLabel").textContent = monthLabel(S.month);
     $("#monthNav").hidden = !inApp;
     $("#logout").hidden = !inApp; $("#refreshBtn").hidden = !inApp;
-    $("#tabs").innerHTML = inApp ? TABS.map(function (t) { return '<button type="button" data-tab="' + t.id + '" class="' + (t.id === S.tab ? "on" : "") + '">' + t.label + "</button>"; }).join("") : "";
+    $("#tabs").innerHTML = inApp ? TABS.filter(function (t) { return t.id !== "team" || S.myRole === "owner"; }).map(function (t) { return '<button type="button" data-tab="' + t.id + '" class="' + (t.id === S.tab ? "on" : "") + '">' + t.label + "</button>"; }).join("") : "";
   }
   function render() {
     renderShell();
     var app = $("#app");
     if (S.role === "loading") { app.innerHTML = '<p class="empty">Chargement…</p>'; return; }
     if (S.role === "nocfg") { app.innerHTML = '<div class="notice"><h1>Base de données non configurée</h1><p class="muted">Ajoutez l\'adresse et la clé Supabase de Catch dans <code>gestion/config.json</code>.</p></div>'; return; }
+    if (S.role === "denied") { app.innerHTML = '<div class="notice"><h1>Accès réservé</h1><p class="muted">Ce compte est un compte équipe : Catch Gestion est réservé au propriétaire et aux managers. Pour les réservations et les clients, utilisez la page Bookings.</p><p><a class="btn" href="https://www.catchmarrakech.com/bookings">Ouvrir Bookings</a> <button class="btn ghost" type="button" data-act="logout">Déconnexion</button></p></div>'; return; }
     if (S.role === "login") { app.innerHTML = viewLogin(); var le = $("#lEmail"); if (le && !le.value) le.focus(); return; }
-    var fn = { dash: viewDash, sales: viewSales, costs: viewCosts, credits: viewCredits, staff: viewStaff, resa: viewResa, stats: viewStats }[S.tab] || viewDash;
+    var fn = { dash: viewDash, sales: viewSales, costs: viewCosts, credits: viewCredits, staff: viewStaff, resa: viewResa, clients: viewClients, stats: viewStats, team: viewTeam }[S.tab] || viewDash;
     var active = document.activeElement && document.activeElement.id, saved = {};
     $$("input[id], select[id], textarea[id]", app).forEach(function (el) { if (el.type !== "file" && !el.hasAttribute("data-f")) saved[el.id] = el.value; });
     var sx = window.scrollX, sy = window.scrollY;
@@ -449,6 +449,7 @@
       kpi("Factures non payées", dh0(sumAmt(up)), up.length ? "neg" : "", up.length + " à régler (tous mois)") +
       kpi("Crédits à encaisser", dh0(creditsOpenTotal()), "", S.credits.filter(function (c) { return creditLeft(c) > 0; }).length + " crédit(s) ouvert(s)") +
       kpi("Réservations", a ? String(a.n) : "…", "bk", a ? a.guests + " couverts · " + a.noshow + " no-show" : "chargement") +
+      (function () { var vm = S.visits.filter(function (v) { return monthOf(v.date) === mk; }), t = vm.reduce(function (s, v) { return s + v.amount; }, 0), c = vm.reduce(function (s, v) { return s + v.covers; }, 0); return kpi("Additions des tables", dh0(t), "", vm.length + " table(s) · " + dh0(c ? t / c : 0) + " / couvert"); })() +
       "</div>";
     h += '<div class="grid g2"><div class="panel"><h2>Ventes par jour</h2>' + salesChart(mk) + "</div>";
     h += '<div class="panel"><h2>Dépenses par catégorie</h2>' + hbars(catRows(costsOf(mk)), { empty: "Aucune dépense ce mois." }) + "</div></div>";
@@ -676,6 +677,77 @@
     return h;
   }
 
+  // ----- Clients
+  var VIP_VISITS = 5, VIP_SPEND = 5000, REG_VISITS = 2;
+  var GST = { vip: "VIP", regular: "Habitué", "new": "Nouveau", blocked: "Bloqué" };
+  var GCOL = { vip: "var(--gold)", regular: "var(--c-tpe)", "new": "var(--muted)", blocked: "var(--bad)" };
+  function gStatsAll() {
+    var by = {};
+    Object.keys(S.guests).forEach(function (id) { by[id] = { visits: 0, total: 0, covers: 0, first: null, last: null, list: [], noshow: 0, cancel: 0, bookings: 0 }; });
+    S.visits.forEach(function (v) { var o = by[v.guest_id]; if (!o) return; o.visits++; o.total += v.amount; o.covers += v.covers; o.list.push(v); if (!o.first || v.date < o.first) o.first = v.date; if (!o.last || v.date > o.last) o.last = v.date; });
+    S.resAll.forEach(function (r) { var o = by[r.guest_id]; if (!o) return; o.bookings++; if (r.status === "no-show") o.noshow++; if (r.status === "cancelled") o.cancel++; });
+    Object.keys(by).forEach(function (id) { var o = by[id]; o.avg = o.visits ? o.total / o.visits : 0; o.perCover = o.covers ? o.total / o.covers : 0; o.list.sort(function (a, b) { return a.date < b.date ? 1 : -1; }); });
+    return by;
+  }
+  function gSuggest(st) { return st.visits >= VIP_VISITS || st.total >= VIP_SPEND ? "vip" : st.visits >= REG_VISITS ? "regular" : "new"; }
+  function gStatus(g, st) { return g.status_manual ? g.status : gSuggest(st); }
+  function gBadge(s) { return '<span class="pill" style="border:1px solid ' + GCOL[s] + ";color:" + GCOL[s] + '">' + GST[s] + "</span>"; }
+  function viewClients() {
+    var mk = S.month, yr = mk.slice(0, 4), stats = gStatsAll();
+    var rows = Object.keys(S.guests).map(function (id) { var g = S.guests[id], st = stats[id]; return { g: g, st: st, s: gStatus(g, st) }; });
+    var vm = S.visits.filter(function (v) { return monthOf(v.date) === mk; }), seen = {};
+    vm.forEach(function (v) { if (v.guest_id) seen[v.guest_id] = 1; });
+    var nNew = 0, nRet = 0; Object.keys(seen).forEach(function (gid) { var st = stats[gid]; if (st && monthOf(st.first) === mk) nNew++; else nRet++; });
+    var vt = vm.reduce(function (t, v) { return t + v.amount; }, 0), vc = vm.reduce(function (t, v) { return t + v.covers; }, 0);
+    var h = '<h1>Clients</h1><p class="sub">Chaque client est reconnu par son numéro de téléphone. Les visites et additions sont saisies par l\'équipe sur la page Bookings. Statut automatique : VIP dès ' + VIP_VISITS + " visites ou " + dh0(VIP_SPEND) + " dépensés, Habitué dès " + REG_VISITS + " visites. Vous pouvez le changer à la main.</p>";
+    h += '<div class="kpis">' + kpi("Clients", String(rows.length), "gold", rows.filter(function (r) { return r.s === "vip"; }).length + " VIP · " + rows.filter(function (r) { return r.s === "regular"; }).length + " habitués") +
+      kpi("Venus en " + monthShort(mk), String(nNew + nRet), "", nNew + " nouveau(x) · " + nRet + " fidèle(s)") +
+      kpi("Additions du mois", dh0(vt), "", vm.length + " table(s)") + kpi("Moyenne / couvert", dh0(vc ? vt / vc : 0), "") +
+      kpi("Bloqués", String(rows.filter(function (r) { return r.s === "blocked"; }).length), "") + "</div>";
+    if (S.guestOpen && S.guests[S.guestOpen]) h += guestDetail(S.guests[S.guestOpen], stats[S.guestOpen]);
+    var F = S.f.clients;
+    var list = rows.filter(function (r) { return (!F.st || r.s === F.st) && hit(F.q, [r.g.name, r.g.phone, r.g.email, r.g.notes]); }).sort(function (a, b) { return b.st.total - a.st.total || b.st.visits - a.st.visits || (a.g.name || "").localeCompare(b.g.name || ""); });
+    h += '<div class="panel"><h2>Tous les clients</h2><div class="toolbar">' + fSearch("clients.q", "Rechercher un nom, un téléphone, une note…") + fSelect("clients.st", [["", "Tous les statuts"], ["vip", "VIP"], ["regular", "Habitués"], ["new", "Nouveaux"], ["blocked", "Bloqués"]], "Statut") + '<span class="count">' + list.length + " client(s)</span></div>";
+    if (!list.length) h += '<p class="empty">Aucun client pour le moment. Ils apparaissent dès la première réservation ou la première addition saisie.</p>';
+    else {
+      h += '<div class="tw"><table><thead><tr><th>Client</th><th class="n">Visites</th><th class="n">Total</th><th class="n">Moy. / visite</th><th>Dernière visite</th><th class="n">No-show</th><th></th></tr></thead><tbody>';
+      list.slice(0, 500).forEach(function (r) {
+        h += "<tr><td><strong>" + esc(r.g.name || "—") + "</strong> " + gBadge(r.s) + '<div class="muted small">' + esc(r.g.phone || "") + "</div></td><td class=\"n\">" + r.st.visits + '</td><td class="n"><strong>' + dh0(r.st.total) + '</strong></td><td class="n muted">' + dh0(r.st.avg) + "</td><td>" + (r.st.last ? esc(dayLabel(r.st.last)) + ' <span class="muted small">' + r.st.last.slice(0, 4) + "</span>" : '<span class="muted">—</span>') + '</td><td class="n">' + (r.st.noshow || "") + '</td><td><div class="actions"><button class="btn ghost sm" type="button" data-act="openGuest" data-id="' + r.g.id + '">Ouvrir</button></div></td></tr>';
+      });
+      h += "</tbody></table></div>";
+    }
+    h += "</div>";
+    // new vs returning per month + top clients
+    var months = []; for (var m = 1; m <= 12; m++) months.push(yr + "-" + pad(m));
+    var nw = [], rt = [];
+    months.forEach(function (mm) { var s = {}, a = 0, b = 0; S.visits.forEach(function (v) { if (monthOf(v.date) === mm && v.guest_id) s[v.guest_id] = 1; }); Object.keys(s).forEach(function (gid) { if (stats[gid] && monthOf(stats[gid].first) === mm) a++; else b++; }); nw.push(a); rt.push(b); });
+    var top = rows.filter(function (r) { return r.st.total > 0; }).sort(function (a, b) { return b.st.total - a.st.total; }).slice(0, 10).map(function (r) { return [r.g.name || r.g.phone || "—", r.st.total]; });
+    h += '<div class="grid g2 mt"><div class="panel"><h2>Nouveaux et fidèles ' + yr + "</h2>" + barChart(months.map(monthShort), [{ cls: "s-cash", name: "Fidèles", values: rt }, { cls: "s-tpe", name: "Nouveaux", values: nw }], { every: 1, empty: "Aucune visite enregistrée cette année.", fmt: function (v) { return nf0.format(v); } }) + '</div><div class="panel"><h2>Top 10 clients</h2>' + hbars(top, { fmt: dh0, empty: "Aucune addition enregistrée." }) + "</div></div>";
+    return h;
+  }
+  function guestDetail(g, st) {
+    var s = gStatus(g, st);
+    var h = '<div class="panel hl" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">' + esc(g.name || "Client") + " " + gBadge(s) + '</h2><button class="btn ghost sm" type="button" data-act="closeGuest">Fermer</button></div>' +
+      '<p class="muted small" style="margin:4px 0 12px">' + esc(g.phone || "") + (g.email ? " · " + esc(g.email) : "") + " · client depuis " + esc(dayLabel(String(g.created_at).slice(0, 10))) + "</p>" +
+      '<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">' + kpi("Visites", String(st.visits), "gold") + kpi("Total dépensé", dh0(st.total), "gold") + kpi("Moy. / visite", dh0(st.avg), "") + kpi("Moy. / couvert", dh0(st.perCover), "") + kpi("Réservations", String(st.bookings), "") + kpi("No-show / annul.", st.noshow + " / " + st.cancel, st.noshow ? "neg" : "") + "</div>" +
+      '<form class="f" data-form="gGuest" data-id="' + g.id + '"><div class="row3"><label class="fl">Statut<select id="ggS"><option value="auto"' + (!g.status_manual ? " selected" : "") + ">Automatique (" + GST[gSuggest(st)] + ")</option>" + ["vip", "regular", "new", "blocked"].map(function (k) { return '<option value="' + k + '"' + (g.status_manual && g.status === k ? " selected" : "") + ">" + GST[k] + "</option>"; }).join("") + '</select></label><label class="fl">Nom<input type="text" id="ggN" value="' + esc(g.name || "") + '"></label><label class="fl">Anniversaire<input type="date" id="ggB" value="' + esc(g.birthday || "") + '"></label></div>' +
+      '<label class="fl">Notes (allergies, table préférée…)<input type="text" id="ggT" value="' + esc(g.notes || "") + '"></label><div><button class="btn sm" type="submit">Enregistrer</button></div></form>';
+    h += st.list.length ? '<div class="tw mt"><table><thead><tr><th>Date</th><th>Table</th><th class="n">Couverts</th><th class="n">Addition</th></tr></thead><tbody>' + st.list.map(function (v) { return "<tr><td>" + esc(dayLabel(v.date)) + ' <span class="muted small">' + v.date.slice(0, 4) + "</span></td><td>" + esc(v.table_no || "—") + '</td><td class="n">' + (v.covers || "—") + '</td><td class="n">' + dh(v.amount) + "</td></tr>"; }).join("") + "</tbody></table></div>" : '<p class="muted small mt">Aucune visite enregistrée.</p>';
+    return h + "</div>";
+  }
+
+  // ----- Team (owner only)
+  function viewTeam() {
+    if (S.myRole !== "owner") return '<p class="empty">Réservé au propriétaire.</p>';
+    var ROLES = [["owner", "Propriétaire"], ["manager", "Manager"], ["staff", "Équipe"]];
+    var h = '<h1>Équipe</h1><p class="sub"><strong>Propriétaire</strong> et <strong>Manager</strong> : tout Catch Gestion. <strong>Équipe</strong> : seulement la page Bookings (réservations, clients, additions). Pour ajouter quelqu\'un : Supabase → Authentication → Users → Add user ; le compte apparaît ici en « Équipe », puis choisissez son rôle.</p>';
+    h += '<div class="panel"><div class="tw"><table><thead><tr><th>Compte</th><th>Rôle</th></tr></thead><tbody>' + S.profiles.slice().sort(function (a, b) { return String(a.email).localeCompare(String(b.email)); }).map(function (p) {
+      var mine = user && p.user_id === user.id;
+      return "<tr><td>" + esc(p.email || p.user_id) + (mine ? ' <span class="muted small">(vous)</span>' : "") + '</td><td><select data-role="' + p.user_id + '"' + (mine ? " disabled" : "") + ' style="width:auto">' + ROLES.map(function (o) { return '<option value="' + o[0] + '"' + (p.role === o[0] ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></td></tr>";
+    }).join("") + "</tbody></table></div></div>";
+    return h;
+  }
+
   // ----- Statistics (year)
   function viewStats() {
     var yr = S.month.slice(0, 4), months = [];
@@ -732,14 +804,30 @@
   function showBanner(html) { var b = $("#banner"); if (!html) { b.hidden = true; b.innerHTML = ""; return; } b.hidden = false; b.innerHTML = "<div>" + html + '</div><button class="btn ghost sm" type="button" data-act="hideBanner">✕</button>'; }
 
   var loading = false, again = false, lastSig = "";
-  var TABLES = ["sales_days", "costs", "credits", "staff", "hr_events", "hr_paid"];
+  var TABLES = ["sales_days", "costs", "credits", "staff", "hr_events", "hr_paid", "guests", "visits", "reservations", "profiles"];
+  var COLS = { reservations: "id,guest_id,date,status,guests,source", visits: "id,guest_id,reservation_id,date,table_no,covers,amount" };
+  // Supabase returns at most 1000 rows per request: read page by page
+  async function pageAll(t, cols, filter) {
+    try {
+      var out = [], from = 0;
+      while (true) {
+        var q = sb.from(t).select(cols || COLS[t] || "*");
+        if (filter) q = filter(q);
+        var r = await q.range(from, from + 999);
+        if (r.error) return { data: null, error: r.error };
+        out = out.concat(r.data || []);
+        if (!r.data || r.data.length < 1000) return { data: out };
+        from += 1000;
+      }
+    } catch (er) { return { data: null, error: er }; }
+  }
   async function loadAll() {
     if (!sb || S.role !== "in") return;
     if (loading) { again = true; return; }
     loading = true;
     var rb = $("#refreshBtn"); rb.classList.add("spin");
     try {
-      var fetchAll = function () { return Promise.all(TABLES.map(function (t) { return sb.from(t).select("*").then(function (x) { return x; }, function (er) { return { data: null, error: er }; }); })); };
+      var fetchAll = function () { return Promise.all(TABLES.map(function (t) { return pageAll(t); })); };
       var r = await fetchAll();
       if (r.some(function (x) { return x.error && isJwtErr(x.error); })) { try { await sb.auth.refreshSession(); } catch (er) {} r = await fetchAll(); }
       var bad = [];
@@ -755,6 +843,9 @@
         S.staff = r[3].data.map(function (x) { return { id: x.id, name: x.name, role: x.role || "", phone: x.phone || "", salary: +x.salary || 0, days: +x.days || 26, ot_rate: +x.ot_rate || 0, start_month: x.start_month || "", left_month: x.left_month || "" }; });
         S.ev = r[4].data.map(function (x) { return { id: x.id, worker_id: x.worker_id, type: x.type, date: x.date, value: +x.value || 0 }; });
         var paid = {}; r[5].data.forEach(function (x) { if (x.paid) paid[x.worker_id + "|" + x.month] = true; }); S.paid = paid;
+        var gs = {}; r[6].data.forEach(function (x) { gs[x.id] = x; }); S.guests = gs;
+        S.visits = r[7].data.map(function (x) { return Object.assign({}, x, { amount: +x.amount || 0, covers: +x.covers || 0 }); });
+        S.resAll = r[8].data; S.profiles = r[9].data;
         render();
       }
     } catch (e) { console.error(e); rb.classList.add("err"); }
@@ -810,6 +901,8 @@
     if (act === "creditPay") { S.payCredit = id; render(); return; }
     if (act === "creditPayCancel") { S.payCredit = null; render(); return; }
     if (act === "person") { var nm = b.getAttribute("data-name"); S.person = nm && S.person !== nm ? nm : null; render(); return; }
+    if (act === "openGuest") { S.guestOpen = id; render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    if (act === "closeGuest") { S.guestOpen = null; render(); return; }
     if (act === "toggleAddStaff") { S.addStaff = !S.addStaff; render(); return; }
     if (act === "editStaff") { S.editStaff = S.editStaff === id ? null : id; render(); return; }
     if (act === "openFile") {
@@ -873,6 +966,11 @@
     var t = ev.target;
     if (t.hasAttribute && t.hasAttribute("data-f") && t.tagName === "SELECT") { var p = t.getAttribute("data-f").split("."); S.f[p[0]][p[1]] = t.value; render(); return; }
     if (t.id === "sDate") { var v = S.sales[t.value]; if (v) { $("#sCash").value = v.cash || ""; $("#sTpe").value = v.tpe || ""; $("#sNote").value = v.note || ""; } updSaleSum(); }
+    if (t.hasAttribute && t.hasAttribute("data-role")) {
+      var uid = t.getAttribute("data-role"), nr = t.value;
+      dbq(function () { return sb.from("profiles").update({ role: nr }).eq("user_id", uid); }).then(function () { S.profiles.forEach(function (p) { if (p.user_id === uid) p.role = nr; }); toast("Rôle modifié"); }, function (er) { fail(er); render(); });
+      return;
+    }
     if (t.id === "cPaid") $("#cPayWrap").hidden = t.value !== "1";
     if (t.id === "cFile") $("#fileName").textContent = t.files[0] ? t.files[0].name : "Touchez pour choisir (optionnel)";
   });
@@ -939,6 +1037,12 @@
         S.staff.forEach(function (x) { if (x.id === wid) Object.assign(x, patch, { role: patch.role || "", phone: patch.phone || "", left_month: patch.left_month || "" }); });
         S.editStaff = null; render(); toast("Modifications enregistrées");
       }
+      else if (f.getAttribute("data-form") === "gGuest") {
+        var gid = f.getAttribute("data-id"), sv = $("#ggS").value;
+        var gp = { name: $("#ggN").value.trim(), notes: $("#ggT").value.trim() || null, birthday: $("#ggB").value || null, status_manual: sv !== "auto", status: sv === "auto" ? "new" : sv, updated_at: new Date().toISOString() };
+        await dbq(function () { return sb.from("guests").update(gp).eq("id", gid); });
+        Object.assign(S.guests[gid], gp); render(); toast("Client enregistré");
+      }
       else if (f.getAttribute("data-form") === "ev") {
         var eid = f.getAttribute("data-id"), et = $("#evT-" + eid).value, dt = $("#evD-" + eid).value, vv = num($("#evV-" + eid).value);
         if (!dt || vv <= 0) { toast("Entrez une date et une valeur"); return; }
@@ -952,13 +1056,17 @@
   });
 
   // ---------------- boot ----------------
-  function onSession(session) {
+  async function onSession(session) {
     if (session) {
+      if (user && user.id === session.user.id && (S.role === "in" || S.role === "denied")) return;
       user = session.user;
+      var pr = await sb.from("profiles").select("role").eq("user_id", user.id);
+      S.myRole = pr && pr.data && pr.data[0] ? pr.data[0].role : null;
+      if (S.myRole !== "owner" && S.myRole !== "manager") { S.role = "denied"; render(); return; }
       if (S.role !== "in") { S.role = "in"; lastSig = ""; render(); loadAll(); }
       if (!channel && sb.channel) { try { channel = sb.channel("catch-gestion").on("postgres_changes", { event: "*", schema: "public" }, reloadSoon).subscribe(); } catch (er) {} }
     } else {
-      S.role = "login"; S.sales = {}; S.costs = []; S.credits = []; S.staff = []; S.ev = []; S.paid = {}; S.bk = {}; lastSig = ""; user = null;
+      S.role = "login"; S.sales = {}; S.costs = []; S.credits = []; S.staff = []; S.ev = []; S.paid = {}; S.bk = {}; S.guests = {}; S.visits = []; S.resAll = []; S.profiles = []; S.myRole = null; S.guestOpen = null; lastSig = ""; user = null;
       if (channel) { try { sb.removeChannel(channel); } catch (er) {} channel = null; }
       render();
     }
@@ -968,7 +1076,7 @@
     if (!CFG || !CFG.supabaseUrl || !CFG.supabaseKey || /PLACEHOLDER/.test(CFG.supabaseUrl + CFG.supabaseKey)) { S.role = "nocfg"; render(); return; }
     if (!window.supabase || !window.supabase.createClient) { $("#app").innerHTML = '<div class="notice"><h1>Connexion impossible</h1><p class="muted">Vérifiez votre connexion internet et rechargez la page.</p></div>'; return; }
     sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "catch-gestion-auth" } });
-    var r = await sb.auth.getSession(); onSession(r.data && r.data.session);
+    var r = await sb.auth.getSession(); await onSession(r.data && r.data.session);
     sb.auth.onAuthStateChange(function (_e, session) { onSession(session); });
   }
   window.__catchGestion = { S: S, render: render };
