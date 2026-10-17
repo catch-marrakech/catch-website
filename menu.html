@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu · Catch Marrakech</title>
+<meta name="description" content="The menu of Catch Marrakech, Asian kitchen in Marrakech: starters, mains, desserts and drinks.">
+<link rel="canonical" href="https://www.catchmarrakech.com/menu">
+<link rel="icon" type="image/png" href="/icon.png">
+<meta property="og:title" content="Menu · Catch Marrakech">
+<meta property="og:description" content="Where Asian flavors meet Marrakech nights.">
+<meta property="og:image" content="https://www.catchmarrakech.com/og.jpg">
+<meta name="theme-color" content="#0a0807">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="nav solid" id="nav">
+  <a href="/" aria-label="Catch Marrakech home"><span class="logo" role="img" aria-label="Catch Marrakech"></span></a>
+  <div class="nav__right">
+    <a class="btn" href="/#reserve">Book a table</a>
+    <button class="burger" id="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="drawer"><i></i><i></i></button>
+  </div>
+</header>
+<nav class="drawer" id="drawer" aria-hidden="true">
+  <div>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/menu" aria-current="page">Menu</a></li>
+      <li><a href="/#reserve">Book a table</a></li>
+      <li><a href="/#visit">Visit us</a></li>
+      <li><a href="https://www.instagram.com/catchmarrakech/" target="_blank" rel="noopener">Instagram</a></li>
+    </ul>
+    <small>Every night 18:00 – 02:00 · Marrakech</small>
+  </div>
+</nav>
+
+<main>
+  <section class="page-head">
+    <p class="eyebrow">Catch Marrakech</p>
+    <h2>The <em>menu.</em></h2>
+    <p class="lead" style="margin-inline:auto">Choose a category.</p>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="cats" id="cats"></div>
+    <div class="menu-cta"><a class="btn btn--solid" href="/#reserve">Book a table</a></div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span class="logo" role="img" aria-label="Catch Marrakech"></span>
+    <nav><a href="/menu">Menu</a><a href="/#reserve">Book</a><a href="https://maps.app.goo.gl/BqxYbUBCXpp8ehJy6" target="_blank" rel="noopener">Map</a><a href="https://www.instagram.com/catchmarrakech/" target="_blank" rel="noopener">Instagram</a><a href="mailto:info@catchmarrakech.com">info@catchmarrakech.com</a></nav>
+    <p>© <span id="year">2026</span> Catch Marrakech</p>
+  </div>
+</footer>
+
+<script src="/site.js" defer></script>
+<script>
+  // ===== MENU CONTENT =====
+  // Add dishes to a category like this:
+  //   { name: "Dish name", price: "120", text: "Short description" }
+  // Categories can be added, removed or renamed. An empty list shows "Coming soon".
+  var MENU = [
+    { id: "starters", title: "Starters", items: [] },
+    { id: "mains", title: "Mains", items: [] },
+    { id: "desserts", title: "Desserts", items: [] },
+    { id: "drinks", title: "Drinks", items: [] }
+  ];
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  var box = document.getElementById("cats");
+  box.innerHTML = MENU.map(function (c) {
+    var items = c.items.length
+      ? c.items.map(function (i) { return '<div class="item"><b>' + esc(i.name) + "</b>" + (i.price ? "<em>" + esc(i.price) + " DH</em>" : "<span></span>") + (i.text ? "<p>" + esc(i.text) + "</p>" : "") + "</div>"; }).join("")
+      : '<p class="soon">Coming soon</p>';
+    return '<div class="cat" id="' + c.id + '"><button type="button" aria-expanded="false" aria-controls="items-' + c.id + '"><span>' + esc(c.title) + "</span><small>" + (c.items.length ? c.items.length + " dishes" : "Soon") + '</small><i aria-hidden="true"></i></button><div class="cat__items" id="items-' + c.id + '">' + items + "</div></div>";
+  }).join("");
+  function openCat(el, open) { el.classList.toggle("open", open); el.querySelector("button").setAttribute("aria-expanded", open ? "true" : "false"); }
+  box.addEventListener("click", function (e) {
+    var b = e.target.closest(".cat > button"); if (!b) return;
+    var cat = b.parentNode, open = !cat.classList.contains("open");
+    openCat(cat, open);
+    if (open) history.replaceState(null, "", "#" + cat.id);
+  });
+  var start = location.hash && document.getElementById(location.hash.slice(1));
+  if (start && start.classList.contains("cat")) openCat(start, true);
+</script>
+</body>
+</html>
