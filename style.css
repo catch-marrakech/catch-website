@@ -138,6 +138,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8) sepia(.6)}
 .soon{color:var(--muted);font-size:13px;letter-spacing:.22em;text-transform:uppercase}
 .menu-cta{text-align:center;padding-top:clamp(48px,7vw,80px)}
 
+/* ---------- fusion intro ---------- */
+.fusion{background:radial-gradient(50% 70% at 100% 0%,rgba(232,135,58,.12),transparent 60%),var(--black)}
+.fusion__grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(28px,6vw,80px);align-items:center}
+.fusion .lead{margin-top:0;max-width:56ch;color:#cdbfb2}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:28px}
+.pillars div{background:var(--walnut);padding:18px 16px;border-top:2px solid var(--ember)}
+.pillars b{display:block;font-family:var(--serif);font-weight:500;font-size:24px;color:var(--saffron)}
+.pillars small{font-size:13px;color:var(--muted)}
+.visit__grid--2{grid-template-columns:repeat(2,1fr)}
+
 /* ---------- colour band ---------- */
 .band{overflow:hidden;background:linear-gradient(90deg,var(--chili),var(--ember) 50%,var(--saffron));color:#1a0d06;padding:14px 0;white-space:nowrap}
 .band div{display:inline-flex;gap:42px;padding-right:42px;animation:slide 32s linear infinite;font-family:var(--serif);font-size:clamp(20px,2.4vw,26px);font-style:italic}
@@ -164,11 +174,13 @@ footer{padding:48px clamp(16px,5vw,64px) 36px;border-top:1px solid var(--line);b
   .hero::after{background:radial-gradient(80% 50% at 50% 50%,rgba(10,8,7,.82),rgba(10,8,7,.5) 70%,rgba(10,8,7,.3)),linear-gradient(180deg,rgba(10,8,7,.7),transparent 25%,transparent 70%,var(--black))}
 }
 @media (max-width:860px){
+  .fusion__grid{grid-template-columns:1fr}
   .reserve__grid{grid-template-columns:1fr}
   .visit__grid{grid-template-columns:1fr}
 }
 @media (max-width:520px){
   form.book{grid-template-columns:1fr}
+  .pillars{grid-template-columns:1fr}
   .nav__right .btn{display:none}
   .cat > button small{display:none}
 }
