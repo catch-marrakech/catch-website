@@ -150,7 +150,7 @@
   input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8) sepia(.6)}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   .book__foot{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-top:6px}
-  .book__foot small{color:var(--muted);font-size:12px;max-width:36ch}
+  .book__foot small{color:var(--muted);font-size:12px;max-width:46ch}
   .msg{grid-column:1/-1;font-size:14px;padding:14px 16px;border:1px solid;display:none}
   .msg.err{display:block;color:var(--danger);border-color:rgba(224,138,110,.4);background:rgba(224,138,110,.06)}
   .done{border:1px solid rgba(230,192,96,.3);background:rgba(18,14,11,.7);padding:clamp(28px,5vw,56px);text-align:center;display:none}
@@ -319,7 +319,7 @@
           <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
           <p class="msg" id="book-msg" role="alert"></p>
           <div class="book__foot">
-            <small>Your booking is a request until we confirm it.</small>
+            <small>Your booking is a request until we confirm it. We keep your name and contact details to manage your bookings and visits, in line with Moroccan law 09-08. To see or delete them, email info@catchmarrakech.com.</small>
             <button class="btn btn--solid" type="submit" id="book-btn">Request booking</button>
           </div>
         </form>

@@ -2,235 +2,433 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0907">
 <title>Bookings · Catch Marrakech</title>
-<link rel="icon" type="image/png" href="icon.png">
+<link rel="icon" type="image/png" href="/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--black:#0b0907;--ink:#120e0b;--b9:#1c140f;--b8:#2a1d15;--b4:#8a6a50;--gold:#e6c060;--cream:#efe4d2;--muted:#b3a38e;
-    --pending:#e6c060;--confirmed:#7fcf8a;--cancelled:#e08a6e;--seated:#7fb6cf;--noshow:#9a8f86;
-    --serif:"Cormorant Garamond",Georgia,serif;--sans:"Manrope",system-ui,-apple-system,Segoe UI,sans-serif}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--black);color:var(--cream);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+  :root{--bg:#0b0907;--ink:#120e0b;--p:#15100c;--p2:#1d1611;--p3:#2a1f17;--gold:#e6c060;--gold2:#f0d58c;--dim:rgba(230,192,96,.13);--text:#efe4d2;--muted:#a8987f;--line:rgba(230,192,96,.2);--line2:rgba(239,228,210,.08);
+    --pending:#e9b949;--confirmed:#7fcf8a;--seated:#7fb6cf;--done:#a8987f;--cancelled:#e08a6e;--noshow:#9a8f86;--vip:#e6c060;--regular:#7fb6cf;--new:#a8987f;--blocked:#e08a6e;
+    --serif:"Cormorant Garamond",Georgia,serif;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text)}
+  body{font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
   a{color:inherit}
-  button,input,select{font:inherit}
-  .top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;justify-content:space-between;padding:14px 16px;background:rgba(11,9,7,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(230,192,96,.15)}
-  .top img{height:26px}
-  .top h1{font:500 22px var(--serif);color:var(--gold);margin-right:auto}
-  .wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
-  .btn{border:1px solid var(--gold);background:transparent;color:var(--gold);padding:9px 14px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
-  .btn:hover{background:var(--gold);color:var(--black)}
-  .btn--solid{background:var(--gold);color:var(--black)}
-  .btn--sm{padding:7px 10px;font-size:11px;letter-spacing:.1em}
-  .ghost{border-color:rgba(230,192,96,.3);color:var(--muted)}
-  /* login */
-  .login{max-width:360px;margin:12vh auto 0;padding:32px 24px;border:1px solid rgba(230,192,96,.25);background:var(--ink);text-align:center}
-  .login img{width:180px;margin:0 auto 24px;display:block}
-  .login input{width:100%;margin:8px 0 14px;padding:12px;background:var(--black);border:1px solid rgba(230,192,96,.25);color:var(--cream)}
-  .login .btn{width:100%}
-  .err{color:var(--cancelled);font-size:13px;min-height:20px;margin-top:10px}
-  /* controls */
-  .tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
-  .tabs button.on{background:var(--gold);color:var(--black)}
-  .tabs input{background:var(--ink);border:1px solid rgba(230,192,96,.25);color:var(--cream);padding:7px 10px}
+  button,input,select,textarea{font:inherit;color:inherit}
+  [hidden]{display:none!important}
+  .top{position:sticky;top:0;z-index:10;background:rgba(11,9,7,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+  .bar{max-width:1060px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .bar img{height:26px}
+  .bar h1{font:700 22px var(--serif);color:var(--gold);margin:0 auto 0 4px}
+  .tabs{max-width:1060px;margin:0 auto;padding:0 16px 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px 16px 90px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gold);background:transparent;color:var(--gold);padding:8px 12px;border-radius:3px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;white-space:nowrap;text-decoration:none}
+  .btn:hover{background:var(--dim)}
+  .btn.solid{background:var(--gold);color:#0b0907}
+  .btn.solid:hover{background:var(--gold2)}
+  .btn.ghost{border-color:var(--line2);color:var(--muted)}
+  .btn.ghost:hover{color:var(--text);border-color:var(--muted)}
+  .btn.on{background:var(--gold);color:#0b0907}
+  .btn.sm{padding:5px 9px;font-size:11px}
+  .btn:disabled{opacity:.45;cursor:wait}
+  input,select,textarea{background:var(--p2);border:1px solid var(--line2);border-radius:3px;padding:9px 10px;font-size:15px;width:100%;min-width:0}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
   input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8) sepia(.6)}
-  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
-  .stat{border:1px solid rgba(230,192,96,.18);background:var(--ink);padding:10px 14px;min-width:110px}
-  .stat b{display:block;font:500 26px var(--serif);color:var(--gold)}
-  .stat small{color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-  /* list */
-  .day{margin-top:26px}
-  .day h2{font:500 24px var(--serif);color:var(--gold);border-bottom:1px solid rgba(230,192,96,.15);padding-bottom:6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
-  .day h2 small{font:500 12px var(--sans);color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-  .res{display:grid;grid-template-columns:64px 1fr auto;gap:6px 16px;padding:14px;border:1px solid rgba(230,192,96,.12);background:var(--b9);margin-bottom:8px;border-left:3px solid var(--c,var(--pending))}
-  .res.cancelled,.res.no-show{opacity:.55}
-  .res .t{font:500 24px var(--serif);color:var(--cream)}
+  .tabs input[type=date]{width:auto;padding:6px 8px;font-size:13px}
+  label.fl{display:grid;gap:4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  label.fl input,label.fl select,label.fl textarea{text-transform:none;letter-spacing:0;font-weight:400;color:var(--text)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+  .stat{border:1px solid var(--line2);background:var(--p);padding:10px 12px;border-radius:3px}
+  .stat b{display:block;font:700 24px var(--serif);color:var(--gold);line-height:1.1}
+  .stat small{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+  .day{margin-top:18px}
+  .day h2{font:700 22px var(--serif);color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:4px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .day h2 small{font:600 12px var(--sans);color:var(--muted)}
+  .res{display:grid;grid-template-columns:66px minmax(0,1fr) auto;gap:6px 14px;padding:12px;border:1px solid var(--line2);background:var(--p);border-radius:3px;margin-bottom:8px;border-left:3px solid var(--c,var(--pending))}
+  .res.cancelled,.res.no-show{opacity:.5}
+  .res .t{font:700 22px var(--serif)}
   .res .g{font-size:12px;color:var(--muted)}
-  .res .who b{font-weight:600}
-  .res .who div{font-size:13px;color:var(--muted);word-break:break-word}
-  .res .who a{color:var(--cream)}
-  .res .notes{margin-top:6px;font-size:13px;color:var(--cream);background:rgba(230,192,96,.06);padding:6px 8px;border-left:2px solid rgba(230,192,96,.3)}
-  .badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--c);color:var(--c);margin-left:8px;vertical-align:2px}
-  .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
-  .acts select{background:var(--ink);color:var(--cream);border:1px solid rgba(230,192,96,.25);padding:6px 8px}
-  .empty{color:var(--muted);text-align:center;padding:50px 10px;border:1px dashed rgba(230,192,96,.2)}
-  .pending{--c:var(--pending)} .confirmed{--c:var(--confirmed)} .cancelled{--c:var(--cancelled)} .seated{--c:var(--seated)} .no-show{--c:var(--noshow)}
-  .hidden{display:none!important}
-  @media (max-width:600px){
-    .res{grid-template-columns:54px 1fr}
-    .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
-    .acts > *{flex:1}
+  .who b{font-size:15px}
+  .who .line{font-size:13px;color:var(--muted);word-break:break-word}
+  .who .gnotes{margin-top:4px;font-size:13px;background:var(--dim);border-left:2px solid var(--gold);padding:4px 8px;color:var(--text)}
+  .who .rnotes{margin-top:4px;font-size:13px;color:var(--text);border-left:2px solid var(--line);padding:2px 8px}
+  .linkbtn{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--text);font-weight:700;font-size:15px;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+  .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:99px;border:1px solid var(--c);color:var(--c);margin-left:6px;vertical-align:2px;white-space:nowrap}
+  .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:132px}
+  .acts select{padding:5px 8px;font-size:13px}
+  .closeform{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto auto;gap:8px;align-items:end;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
+  .pending{--c:var(--pending)}.confirmed{--c:var(--confirmed)}.seated{--c:var(--seated)}.done{--c:var(--done)}.cancelled{--c:var(--cancelled)}.no-show{--c:var(--noshow)}
+  .s-vip{--c:var(--vip)}.s-regular{--c:var(--regular)}.s-new{--c:var(--new)}.s-blocked{--c:var(--blocked)}
+  .empty{color:var(--muted);text-align:center;padding:40px 10px;border:1px dashed var(--line);border-radius:3px}
+  .login{max-width:360px;margin:12vh auto 0;padding:28px 22px;border:1px solid var(--line);background:var(--p);border-radius:4px;display:grid;gap:12px}
+  .login img{width:170px;margin:0 auto 6px;display:block}
+  .err{color:var(--cancelled);font-size:13px;min-height:18px;margin:0}
+  .ok{color:var(--confirmed);font-size:13px;margin:0}
+  .glist{display:grid;gap:6px}
+  .grow{display:grid;grid-template-columns:minmax(0,1fr) 70px 110px 110px;gap:10px;align-items:center;padding:10px 12px;background:var(--p);border:1px solid var(--line2);border-radius:3px;cursor:pointer;text-align:left;width:100%}
+  .grow:hover{border-color:var(--line)}
+  .grow .n{text-align:right;font-variant-numeric:tabular-nums}
+  .grow small{color:var(--muted)}
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+  .sheet{width:100%;max-width:640px;background:var(--ink);border:1px solid var(--line);border-radius:4px;padding:18px}
+  .sheet h3{font:700 26px var(--serif);color:var(--gold);margin:0 0 4px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .sheet .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .sheet .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .sheet form{display:grid;gap:10px}
+  .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px;border-bottom:1px solid var(--line)}
+  td{padding:7px 6px;border-bottom:1px solid var(--line2)}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:3px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:all .2s;z-index:50;max-width:calc(100% - 32px)}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .muted{color:var(--muted)}
+  @media (max-width:640px){
+    .res{grid-template-columns:54px minmax(0,1fr)}
+    .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;min-width:0}
+    .acts>*{flex:1 1 auto}
+    .closeform{grid-template-columns:1fr 1fr 1fr}
+    .closeform .btn{grid-column:span 3}
+    .grow{grid-template-columns:minmax(0,1fr) 90px}
+    .grow .hide-m{display:none}
+    .sheet .grid3{grid-template-columns:1fr 1fr}
+    .kp{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
 <body>
 
-<div id="login" class="login">
-  <img src="logo-sm.png" alt="Catch Marrakech">
-  <form id="login-form">
-    <label for="pw" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)">Staff password</label>
-    <input id="pw" type="password" autocomplete="current-password" required>
-    <button class="btn btn--solid" type="submit">Open bookings</button>
-    <p class="err" id="login-err"></p>
+<div id="loginView" class="login" hidden>
+  <img src="/logo-sm.png" alt="Catch Marrakech">
+  <form id="fLogin" style="display:grid;gap:12px">
+    <label class="fl">Email<input type="email" id="lEmail" autocomplete="username" required></label>
+    <label class="fl">Password<input type="password" id="lPass" autocomplete="current-password" required></label>
+    <button class="btn solid" type="submit" id="lBtn">Log in</button>
+    <p class="err" id="lErr"></p>
   </form>
 </div>
 
-<div id="app" class="hidden">
+<div id="appView" hidden>
   <header class="top">
-    <img src="icon.png" alt="">
-    <h1>Bookings</h1>
-    <button class="btn btn--sm ghost" id="refresh" title="Refresh">Refresh</button>
-    <button class="btn btn--sm ghost" id="logout">Log out</button>
+    <div class="bar">
+      <img src="/icon.png" alt="">
+      <h1>Bookings</h1>
+      <button class="btn solid sm" type="button" data-act="openWalkin">+ Walk-in</button>
+      <button class="btn sm" type="button" data-act="openNew">+ Booking</button>
+      <button class="btn ghost sm" type="button" data-act="refresh" title="Refresh">↻</button>
+      <button class="btn ghost sm" type="button" data-act="logout">Log out</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="btn sm" data-r="today">Tonight</button>
+      <button class="btn sm" data-r="tomorrow">Tomorrow</button>
+      <button class="btn sm" data-r="week">Next 7 days</button>
+      <button class="btn sm" data-r="past">Past 7 days</button>
+      <input type="date" id="pick" aria-label="Pick a date">
+      <button class="btn sm" data-r="guests">Guests</button>
+    </div>
   </header>
   <div class="wrap">
-    <div class="tabs" id="tabs">
-      <button class="btn btn--sm" data-r="today">Tonight</button>
-      <button class="btn btn--sm" data-r="tomorrow">Tomorrow</button>
-      <button class="btn btn--sm" data-r="upcoming">Next 30 days</button>
-      <button class="btn btn--sm" data-r="past">Past 7 days</button>
-      <input type="date" id="pick" title="Pick a date">
-    </div>
     <div class="stats" id="stats"></div>
-    <div id="list"></div>
+    <div id="list"><p class="empty">Loading…</p></div>
   </div>
 </div>
 
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const $ = (s) => document.querySelector(s);
-const KEY = 'catch-bookings';
-let pass = '';
-try { pass = sessionStorage.getItem(KEY) || ''; } catch (e) {}
-let range = 'today', today = null, lastItems = [];
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var nf = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+  var dh = function (v) { return nf.format(Math.round(+v || 0)) + " DH"; };
+  var num = function (v) { var n = parseFloat(String(v == null ? "" : v).replace(/[^0-9,.\-]/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  function addDays(iso, n) { var d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+  function niceDate(iso) { return new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }); }
+  function shortDate(iso) { return new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); }
+  // Service day in Marrakech: until 03:00 it is still the previous evening.
+  function serviceToday() {
+    var p = {};
+    try { new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Casablanca", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" }).formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; }); }
+    catch (e) { var d0 = new Date(); p = { year: d0.getFullYear(), month: pad(d0.getMonth() + 1), day: pad(d0.getDate()), hour: d0.getHours() }; }
+    var ds = p.year + "-" + p.month + "-" + p.day;
+    return +p.hour < 3 ? addDays(ds, -1) : ds;
+  }
+  var sortKey = function (r) { return r.date + (r.time < "06:00" ? "2" : "1") + r.time; };
+  function waNumber(phone) { var d = String(phone || "").replace(/\D/g, ""); if (d.indexOf("00") === 0) d = d.slice(2); else if (d.charAt(0) === "0" && d.length === 10) d = "212" + d.slice(1); return d; }
+  function newRef() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "C-", b = new Uint8Array(6); crypto.getRandomValues(b); for (var i = 0; i < 6; i++) s += a[b[i] % 32]; return s; }
+  var toastT; function toast(t) { var el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 2400); }
+  var SLOTS = []; for (var m = 18 * 60; m <= 25 * 60; m += 30) SLOTS.push(pad(Math.floor(m / 60) % 24) + ":" + pad(m % 60));
+  var STATUS = ["pending", "confirmed", "seated", "done", "cancelled", "no-show"];
+  var GSTAT = { vip: "VIP", regular: "Regular", "new": "New", blocked: "Blocked" };
+  // Automatic suggestion (owner can override in the guest profile)
+  var VIP_VISITS = 5, VIP_SPEND = 5000, REG_VISITS = 2;
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0,10); };
-const niceDate = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', timeZone:'UTC'});
-const sortKey = (r) => r.date + (r.time < '06:00' ? '2' : '1') + r.time;
-function waNumber(phone) {
-  let d = String(phone).replace(/\D/g, '');
-  if (d.startsWith('00')) d = d.slice(2);
-  else if (d.startsWith('0') && d.length === 10) d = '212' + d.slice(1); // Moroccan local number
-  return d;
-}
+  var sb = null, me = null, role = null, range = "today", today = serviceToday();
+  var S = { res: [], guests: {}, visits: [], resAll: [], q: "", closing: null, seating: null };
 
-async function api(method, qs, body) {
-  const r = await fetch('/api/bookings' + (qs || ''), {
-    method, headers: {'x-admin-key': pass, 'Content-Type': 'application/json'},
-    body: body ? JSON.stringify(body) : undefined, cache: 'no-store'
+  // ---------- data ----------
+  async function fetchAll(q) { // pages through results (Supabase returns max 1000 rows per request)
+    var out = [], from = 0, size = 1000;
+    while (true) {
+      var r = await q().range(from, from + size - 1);
+      if (r.error) throw r.error;
+      out = out.concat(r.data || []);
+      if (!r.data || r.data.length < size) return out;
+      from += size;
+    }
+  }
+  function rangeDates() {
+    if (range === "today") return [today, today];
+    if (range === "tomorrow") return [addDays(today, 1), addDays(today, 1)];
+    if (range === "week") return [today, addDays(today, 6)];
+    if (range === "past") return [addDays(today, -7), addDays(today, -1)];
+    if (range === "guests") return null;
+    return [range, range];
+  }
+  async function load() {
+    today = serviceToday();
+    try {
+      var rd = rangeDates();
+      var jobs = [
+        fetchAll(function () { return sb.from("guests").select("*").order("created_at"); }),
+        fetchAll(function () { return sb.from("visits").select("id,guest_id,reservation_id,date,table_no,covers,amount,note").order("date"); }),
+        fetchAll(function () { return sb.from("reservations").select("id,guest_id,status,date").order("date"); })
+      ];
+      if (rd) jobs.push(fetchAll(function () { return sb.from("reservations").select("*").gte("date", rd[0]).lte("date", rd[1]).order("date"); }));
+      var r = await Promise.all(jobs);
+      S.guests = {}; r[0].forEach(function (g) { S.guests[g.id] = g; });
+      S.visits = r[1]; S.resAll = r[2]; S.res = rd ? r[3] : [];
+      render();
+    } catch (e) { console.error(e); $("#list").innerHTML = '<p class="empty">Could not load: ' + esc(e.message || e) + "</p>"; }
+  }
+  function gStats(gid) {
+    var v = S.visits.filter(function (x) { return x.guest_id === gid; });
+    var rs = S.resAll.filter(function (x) { return x.guest_id === gid; });
+    var total = v.reduce(function (t, x) { return t + (+x.amount || 0); }, 0), covers = v.reduce(function (t, x) { return t + (+x.covers || 0); }, 0);
+    var last = v.reduce(function (l, x) { return !l || x.date > l ? x.date : l; }, null);
+    return { visits: v.length, total: total, avg: v.length ? total / v.length : 0, perCover: covers ? total / covers : 0, last: last, list: v.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }),
+      noshow: rs.filter(function (x) { return x.status === "no-show"; }).length, cancelled: rs.filter(function (x) { return x.status === "cancelled"; }).length, bookings: rs.length };
+  }
+  function suggested(st) { return st.visits >= VIP_VISITS || st.total >= VIP_SPEND ? "vip" : st.visits >= REG_VISITS ? "regular" : "new"; }
+  function gStatus(g, st) { if (!g) return "new"; return g.status_manual ? g.status : suggested(st || gStats(g.id)); }
+
+  // ---------- render ----------
+  function render() {
+    document.querySelectorAll("#tabs [data-r]").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-r") === range); });
+    if (range === "guests") return renderGuests();
+    var items = S.res.slice().sort(function (a, b) { return sortKey(a).localeCompare(sortKey(b)); });
+    var active = items.filter(function (r) { return r.status !== "cancelled" && r.status !== "no-show"; });
+    var rd = rangeDates(), revenue = S.visits.filter(function (v) { return v.date >= rd[0] && v.date <= rd[1]; }).reduce(function (t, v) { return t + (+v.amount || 0); }, 0);
+    $("#stats").innerHTML = [["Bookings", active.length], ["Covers", active.reduce(function (t, r) { return t + (+r.guests || 0); }, 0)], ["To confirm", items.filter(function (r) { return r.status === "pending"; }).length], ["Seated", items.filter(function (r) { return r.status === "seated"; }).length], ["Bills entered", dh(revenue)]]
+      .map(function (x) { return '<div class="stat"><b>' + esc(x[1]) + "</b><small>" + x[0] + "</small></div>"; }).join("");
+    if (!items.length) { $("#list").innerHTML = '<p class="empty">No bookings for this period.</p>'; return; }
+    var byDay = {}; items.forEach(function (r) { (byDay[r.date] = byDay[r.date] || []).push(r); });
+    $("#list").innerHTML = Object.keys(byDay).sort().map(function (d) {
+      var rs = byDay[d], g = rs.filter(function (r) { return r.status !== "cancelled" && r.status !== "no-show"; }).reduce(function (t, r) { return t + (+r.guests || 0); }, 0);
+      return '<div class="day"><h2>' + esc(niceDate(d)) + (d === today ? " · tonight" : "") + "<small>" + g + " covers</small></h2>" + rs.map(card).join("") + "</div>";
+    }).join("");
+  }
+  function card(r) {
+    var g = S.guests[r.guest_id], st = g ? gStats(g.id) : null, gs = gStatus(g, st);
+    var visitTxt = st ? (st.visits ? st.visits + (st.visits === 1 ? " visit" : " visits") + " · " + dh(st.total) + " spent" + (st.last ? " · last " + shortDate(st.last) : "") : "First visit") : "";
+    var warn = st && st.noshow ? " · " + st.noshow + " no-show" + (st.noshow > 1 ? "s" : "") : "";
+    var bill = S.visits.filter(function (v) { return v.reservation_id === r.id; }).reduce(function (t, v) { return t + (+v.amount || 0); }, 0);
+    var msg = encodeURIComponent("Hello " + r.name + ", your table at Catch Marrakech for " + r.guests + " on " + niceDate(r.date) + " at " + r.time + " is confirmed. See you soon! (Ref " + r.ref + ")");
+    var h = '<div class="res ' + esc(r.status) + '"><div><div class="t">' + esc(r.time) + '</div><div class="g">' + esc(r.guests) + (r.guests == 1 ? " guest" : " guests") + (r.table_no ? "<br>Table " + esc(r.table_no) : "") + "</div></div>" +
+      '<div class="who">' + (g ? '<button class="linkbtn" type="button" data-act="guest" data-id="' + g.id + '">' + esc(r.name) + "</button>" : "<b>" + esc(r.name) + "</b>") +
+      '<span class="badge s-' + gs + '">' + GSTAT[gs] + '</span><span class="badge ' + esc(r.status) + '">' + esc(r.status) + "</span>" +
+      (r.source !== "web" ? '<span class="badge s-new">' + esc(r.source) + "</span>" : "") +
+      '<div class="line">' + (r.phone ? '<a href="tel:' + esc(String(r.phone).replace(/[^\d+]/g, "")) + '">' + esc(r.phone) + "</a>" : "No phone") + (r.email ? " · " + esc(r.email) : "") + " · " + esc(r.ref) + "</div>" +
+      (g ? '<div class="line">' + esc(visitTxt + warn) + "</div>" : "") +
+      (bill ? '<div class="line" style="color:var(--gold)">Bill: ' + dh(bill) + "</div>" : "") +
+      (g && g.notes ? '<div class="gnotes">★ ' + esc(g.notes) + "</div>" : "") +
+      (r.notes ? '<div class="rnotes">' + esc(r.notes) + "</div>" : "") + "</div>" +
+      '<div class="acts">' +
+      (r.status === "pending" ? '<button class="btn solid sm" type="button" data-act="setStatus" data-id="' + r.id + '" data-s="confirmed">Confirm</button>' : "") +
+      (r.status === "pending" || r.status === "confirmed" ? '<button class="btn sm" type="button" data-act="seat" data-id="' + r.id + '">Seat</button>' : "") +
+      (r.status === "seated" || r.status === "confirmed" || r.status === "done" ? '<button class="btn sm" type="button" data-act="close" data-id="' + r.id + '">' + (r.status === "done" ? "Add bill" : "Close table") + "</button>" : "") +
+      (r.phone ? '<a class="btn ghost sm" target="_blank" rel="noopener" href="https://wa.me/' + waNumber(r.phone) + "?text=" + msg + '">WhatsApp</a>' : "") +
+      '<select data-act="status" data-id="' + r.id + '" aria-label="Status">' + STATUS.map(function (s) { return '<option value="' + s + '"' + (s === r.status ? " selected" : "") + ">" + s + "</option>"; }).join("") + "</select></div>";
+    if (S.seating === r.id) h += '<form class="closeform" data-form="seat" data-id="' + r.id + '"><label class="fl">Table<input id="seatT" value="' + esc(r.table_no || "") + '" required></label><span></span><span></span><button class="btn solid sm" type="submit">Seat</button><button class="btn ghost sm" type="button" data-act="cancelForm">✕</button></form>';
+    if (S.closing === r.id) h += '<form class="closeform" data-form="close" data-id="' + r.id + '"><label class="fl">Table<input id="clT" value="' + esc(r.table_no || "") + '"></label><label class="fl">Covers<input id="clC" type="number" min="1" value="' + esc(r.guests) + '"></label><label class="fl">Bill (DH)<input id="clA" inputmode="decimal" required placeholder="e.g. 1 450"></label><button class="btn solid sm" type="submit">Save bill</button><button class="btn ghost sm" type="button" data-act="cancelForm">✕</button></form>';
+    return h + "</div>";
+  }
+  function renderGuests() {
+    var list = Object.keys(S.guests).map(function (id) { var g = S.guests[id], st = gStats(id); return { g: g, st: st, s: gStatus(g, st) }; });
+    var q = S.q.toLowerCase().trim();
+    if (q) list = list.filter(function (x) { return [x.g.name, x.g.phone, x.g.email, x.g.notes].join(" ").toLowerCase().indexOf(q) >= 0 || String(x.g.phone || "").replace(/\D/g, "").indexOf(q.replace(/\D/g, "") || "#") >= 0; });
+    list.sort(function (a, b) { return b.st.total - a.st.total || b.st.visits - a.st.visits || (a.g.name || "").localeCompare(b.g.name || ""); });
+    var all = Object.keys(S.guests).map(function (id) { var g = S.guests[id]; return gStatus(g); });
+    $("#stats").innerHTML = [["Guests", all.length], ["VIP", all.filter(function (s) { return s === "vip"; }).length], ["Regular", all.filter(function (s) { return s === "regular"; }).length], ["Blocked", all.filter(function (s) { return s === "blocked"; }).length]]
+      .map(function (x) { return '<div class="stat"><b>' + x[1] + "</b><small>" + x[0] + "</small></div>"; }).join("");
+    var h = '<input type="search" id="gq" placeholder="Search name, phone, email, notes…" value="' + esc(S.q) + '" style="margin-bottom:12px">';
+    if (!list.length) h += '<p class="empty">No guests found.</p>';
+    else h += '<div class="glist">' + list.slice(0, 300).map(function (x) {
+      return '<button class="grow" type="button" data-act="guest" data-id="' + x.g.id + '"><span><b>' + esc(x.g.name || "—") + '</b><span class="badge s-' + x.s + '">' + GSTAT[x.s] + '</span><br><small>' + esc(x.g.phone || "") + (x.st.last ? " · last " + shortDate(x.st.last) : "") + '</small></span><span class="n hide-m">' + x.st.visits + '<br><small>visits</small></span><span class="n">' + dh(x.st.total) + '<br><small>total</small></span><span class="n hide-m">' + dh(x.st.avg) + "<br><small>avg / visit</small></span></button>";
+    }).join("") + "</div>";
+    $("#list").innerHTML = h;
+    var gq = $("#gq"); if (document.activeElement && document.activeElement.id !== "gq" && S.q) { /* keep */ }
+  }
+
+  // ---------- modals ----------
+  function openModal(html) { $("#sheet").innerHTML = html; $("#modal").hidden = false; var f = $("#sheet input:not([type=hidden])"); if (f) f.focus(); }
+  function closeModal() { $("#modal").hidden = true; $("#sheet").innerHTML = ""; }
+  function guestSheet(id) {
+    var g = S.guests[id]; if (!g) return;
+    var st = gStats(id), s = gStatus(g, st), sug = suggested(st), canStatus = role === "owner" || role === "manager";
+    var h = '<h3><span>' + esc(g.name || "Guest") + ' <span class="badge s-' + s + '">' + GSTAT[s] + '</span></span><button class="btn ghost sm" type="button" data-act="closeModal">✕</button></h3>' +
+      '<div class="muted">' + (g.phone ? '<a href="tel:' + esc(String(g.phone).replace(/[^\d+]/g, "")) + '">' + esc(g.phone) + "</a>" : "") + (g.email ? " · " + esc(g.email) : "") + " · guest since " + shortDate(String(g.created_at).slice(0, 10)) + "</div>" +
+      '<div class="kp"><div class="stat"><b>' + st.visits + '</b><small>Visits</small></div><div class="stat"><b>' + dh(st.total) + '</b><small>Total spent</small></div><div class="stat"><b>' + dh(st.avg) + '</b><small>Avg / visit</small></div><div class="stat"><b>' + dh(st.perCover) + '</b><small>Avg / cover</small></div><div class="stat"><b>' + st.bookings + '</b><small>Bookings</small></div><div class="stat"><b>' + st.noshow + " / " + st.cancelled + "</b><small>No-show / cancel</small></div></div>" +
+      '<form data-form="guest" data-id="' + id + '"><div class="grid2"><label class="fl">Name<input id="gName" value="' + esc(g.name) + '"></label><label class="fl">Birthday<input id="gBday" type="date" value="' + esc(g.birthday || "") + '"></label></div>' +
+      (canStatus ? '<label class="fl">Status<select id="gStatus"><option value="auto"' + (!g.status_manual ? " selected" : "") + ">Automatic (now: " + GSTAT[sug] + ")</option>" + ["vip", "regular", "new", "blocked"].map(function (k) { return '<option value="' + k + '"' + (g.status_manual && g.status === k ? " selected" : "") + ">" + GSTAT[k] + "</option>"; }).join("") + "</select></label>" : "") +
+      '<label class="fl">Notes (allergies, favourite table, preferences…)<textarea id="gNotes" rows="2">' + esc(g.notes || "") + '</textarea></label><button class="btn solid" type="submit">Save guest</button></form>';
+    h += '<h3 style="font-size:20px;margin-top:16px">Visits</h3>';
+    h += st.list.length ? '<table><thead><tr><th>Date</th><th>Table</th><th class="n">Covers</th><th class="n">Bill</th></tr></thead><tbody>' + st.list.map(function (v) { return "<tr><td>" + shortDate(v.date) + "</td><td>" + esc(v.table_no || "—") + '</td><td class="n">' + esc(v.covers || "—") + '</td><td class="n">' + dh(v.amount) + "</td></tr>"; }).join("") + "</tbody></table>" : '<p class="muted">No visits recorded yet.</p>';
+    openModal(h);
+  }
+  function walkinSheet() {
+    openModal('<h3><span>Walk-in</span><button class="btn ghost sm" type="button" data-act="closeModal">✕</button></h3><p class="muted" style="margin-top:0">Guest without a booking. With a phone number, the visit is added to their profile.</p>' +
+      '<form data-form="walkin"><div class="grid2"><label class="fl">Name<input id="wName" required></label><label class="fl">Phone<input id="wPhone" type="tel" placeholder="optional"></label></div>' +
+      '<div class="grid3"><label class="fl">Covers<input id="wCovers" type="number" min="1" value="2" required></label><label class="fl">Table<input id="wTable"></label><label class="fl">Bill (DH)<input id="wAmt" inputmode="decimal" placeholder="later"></label></div>' +
+      '<p class="muted" style="margin:0;font-size:12px">Leave the bill empty to seat them now and close the table later.</p><button class="btn solid" type="submit">Save</button><p class="err" id="wErr"></p></form>');
+  }
+  function newSheet() {
+    var opts = SLOTS.map(function (t) { return '<option' + (t === "20:00" ? " selected" : "") + ">" + t + "</option>"; }).join("");
+    openModal('<h3><span>New booking</span><button class="btn ghost sm" type="button" data-act="closeModal">✕</button></h3><p class="muted" style="margin-top:0">Booking taken by phone, WhatsApp or Instagram.</p>' +
+      '<form data-form="new"><div class="grid3"><label class="fl">Date<input id="nDate" type="date" required value="' + (rangeDates() ? rangeDates()[0] : today) + '"></label><label class="fl">Time<select id="nTime">' + opts + '</select></label><label class="fl">Guests<input id="nGuests" type="number" min="1" max="60" value="2" required></label></div>' +
+      '<div class="grid2"><label class="fl">Name<input id="nName" required></label><label class="fl">Phone<input id="nPhone" type="tel" required></label></div>' +
+      '<label class="fl">Notes<input id="nNotes" placeholder="optional"></label><button class="btn solid" type="submit">Save booking</button><p class="err" id="nErr"></p></form>');
+  }
+
+  // ---------- actions ----------
+  async function q(p) { var r = await p; if (r && r.error) throw r.error; return r ? r.data : null; }
+  async function setStatus(id, s, extra) {
+    var patch = Object.assign({ status: s, updated_at: new Date().toISOString() }, extra || {});
+    await q(sb.from("reservations").update(patch).eq("id", id));
+    S.res.forEach(function (r) { if (r.id === id) Object.assign(r, patch); });
+    S.resAll.forEach(function (r) { if (r.id === id) r.status = s; });
+  }
+  document.addEventListener("click", async function (e) {
+    var t = e.target.closest("#tabs [data-r]");
+    if (t) { range = t.getAttribute("data-r"); $("#pick").value = ""; S.closing = S.seating = null; render(); load(); return; }
+    if (e.target.id === "modal") { closeModal(); return; }
+    var b = e.target.closest("[data-act]"); if (!b || b.tagName === "SELECT") return;
+    var act = b.getAttribute("data-act"), id = b.getAttribute("data-id");
+    try {
+      if (act === "refresh") return load();
+      if (act === "logout") return sb.auth.signOut();
+      if (act === "closeModal") return closeModal();
+      if (act === "guest") return guestSheet(id);
+      if (act === "openWalkin") return walkinSheet();
+      if (act === "openNew") return newSheet();
+      if (act === "cancelForm") { S.closing = S.seating = null; return render(); }
+      if (act === "seat") { S.seating = id; S.closing = null; render(); var si = $("#seatT"); if (si) si.focus(); return; }
+      if (act === "close") { S.closing = id; S.seating = null; render(); var ci = $("#clA"); if (ci) ci.focus(); return; }
+      if (act === "setStatus") { await setStatus(id, b.getAttribute("data-s")); render(); toast("Booking " + b.getAttribute("data-s")); return; }
+    } catch (er) { console.error(er); toast("Error: " + (er.message || er)); }
   });
-  const j = await r.json().catch(() => ({}));
-  if (r.status === 401) { logout(); throw new Error('Wrong password.'); }
-  if (!r.ok) throw new Error(j.error || 'Error ' + r.status);
-  return j;
-}
+  document.addEventListener("change", async function (e) {
+    var t = e.target;
+    if (t.id === "pick" && t.value) { range = t.value; load(); return; }
+    if (t.matches && t.matches('select[data-act="status"]')) {
+      try { await setStatus(t.getAttribute("data-id"), t.value); render(); toast("Status: " + t.value); } catch (er) { toast("Error: " + (er.message || er)); }
+    }
+  });
+  document.addEventListener("input", function (e) {
+    if (e.target.id === "gq") { S.q = e.target.value; clearTimeout(e.target._t); e.target._t = setTimeout(function () { renderGuests(); var el = $("#gq"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 200); }
+  });
+  document.addEventListener("submit", async function (e) {
+    var f = e.target; e.preventDefault();
+    var btn = f.querySelector("button[type=submit]"); if (btn) btn.disabled = true;
+    try {
+      if (f.id === "fLogin") {
+        $("#lErr").textContent = "";
+        var r = await sb.auth.signInWithPassword({ email: $("#lEmail").value.trim(), password: $("#lPass").value });
+        if (r.error) $("#lErr").textContent = /invalid/i.test(r.error.message) ? "Wrong email or password." : r.error.message;
+      }
+      var kind = f.getAttribute("data-form"), id = f.getAttribute("data-id");
+      if (kind === "seat") {
+        await setStatus(id, "seated", { table_no: $("#seatT").value.trim() || null });
+        S.seating = null; render(); toast("Seated");
+      }
+      if (kind === "close") {
+        var res = S.res.filter(function (x) { return x.id === id; })[0], amt = num($("#clA").value);
+        if (!res || amt <= 0) { toast("Enter the bill amount"); return; }
+        var gid = res.guest_id;
+        if (!gid && res.phone) { gid = await q(sb.rpc("upsert_guest", { p_name: res.name, p_phone: res.phone, p_email: res.email })); await q(sb.from("reservations").update({ guest_id: gid }).eq("id", id)); res.guest_id = gid; }
+        var v = { guest_id: gid || null, reservation_id: id, date: res.date, table_no: $("#clT").value.trim() || null, covers: parseInt($("#clC").value, 10) || res.guests, amount: amt };
+        await q(sb.from("visits").insert(v));
+        S.visits.push(v);
+        await setStatus(id, "done", { table_no: v.table_no });
+        S.closing = null; render(); toast("Bill saved: " + dh(amt));
+      }
+      if (kind === "guest") {
+        var patch = { name: $("#gName").value.trim(), notes: $("#gNotes").value.trim() || null, birthday: $("#gBday").value || null, updated_at: new Date().toISOString() };
+        var gs = $("#gStatus"); if (gs) { if (gs.value === "auto") { patch.status_manual = false; patch.status = "new"; } else { patch.status_manual = true; patch.status = gs.value; } }
+        await q(sb.from("guests").update(patch).eq("id", id));
+        Object.assign(S.guests[id], patch); closeModal(); render(); toast("Guest saved");
+      }
+      if (kind === "walkin") {
+        var name = $("#wName").value.trim(), phone = $("#wPhone").value.trim(), covers = parseInt($("#wCovers").value, 10) || 1, table = $("#wTable").value.trim() || null, a = num($("#wAmt").value);
+        var g2 = phone ? await q(sb.rpc("upsert_guest", { p_name: name, p_phone: phone, p_email: null })) : null;
+        var hp = {}; new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date()).forEach(function (x) { hp[x.type] = x.value; });
+        var hh = hp.hour + ":" + (+hp.minute < 30 ? "00" : "30");
+        var rr = { ref: newRef(), guest_id: g2, date: today, time: hh, guests: covers, name: name, phone: phone || null, status: a > 0 ? "done" : "seated", table_no: table, source: "walkin" };
+        var ins = await q(sb.from("reservations").insert(rr).select());
+        var rid = ins && ins[0] ? ins[0].id : null;
+        if (a > 0) await q(sb.from("visits").insert({ guest_id: g2, reservation_id: rid, date: today, table_no: table, covers: covers, amount: a }));
+        closeModal(); toast("Walk-in saved"); range = "today"; load();
+      }
+      if (kind === "new") {
+        var nPhone = $("#nPhone").value.trim(), nName = $("#nName").value.trim();
+        var g3 = await q(sb.rpc("upsert_guest", { p_name: nName, p_phone: nPhone, p_email: null }));
+        var nr = { ref: newRef(), guest_id: g3, date: $("#nDate").value, time: $("#nTime").value, guests: parseInt($("#nGuests").value, 10) || 2, name: nName, phone: nPhone, notes: $("#nNotes").value.trim() || null, status: "confirmed", source: "phone" };
+        await q(sb.from("reservations").insert(nr));
+        closeModal(); toast("Booking saved: " + nr.ref); range = nr.date === today ? "today" : nr.date; if (range !== "today") $("#pick").value = nr.date; load();
+      }
+    } catch (er) {
+      console.error(er);
+      var m = er && er.message || String(er), el = f.querySelector(".err");
+      if (el) el.textContent = "Could not save: " + m; else toast("Could not save: " + m);
+    } finally { if (btn && document.body.contains(btn)) btn.disabled = false; }
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#modal").hidden) closeModal(); });
 
-function rangeParams() {
-  const t = today || new Date().toISOString().slice(0,10);
-  if (range === 'today') return [t, t];
-  if (range === 'tomorrow') return [addDays(t,1), addDays(t,1)];
-  if (range === 'upcoming') return [t, addDays(t,30)];
-  if (range === 'past') return [addDays(t,-7), addDays(t,-1)];
-  return [range, range]; // a specific date
-}
-
-async function load() {
-  const [from, to] = rangeParams();
-  $('#list').innerHTML = '<p class="empty">Loading…</p>';
-  try {
-    const j = await api('GET', `?from=${from}&to=${to}`);
-    if (!today) { today = j.today; if (range !== 'today') return load(); }
-    lastItems = j.items;
-    render();
-  } catch (e) {
-    $('#list').innerHTML = `<p class="empty">${esc(e.message)}</p>`;
-  }
-}
-
-function render() {
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.r === range));
-  const items = [...lastItems].sort((a,b) => sortKey(a).localeCompare(sortKey(b)));
-  const active = items.filter(r => r.status !== 'cancelled' && r.status !== 'no-show');
-  $('#stats').innerHTML = [
-    ['Bookings', active.length],
-    ['Guests', active.reduce((s,r) => s + Number(r.guests), 0)],
-    ['To confirm', items.filter(r => r.status === 'pending').length],
-  ].map(([l,v]) => `<div class="stat"><b>${v}</b><small>${l}</small></div>`).join('');
-
-  if (!items.length) { $('#list').innerHTML = '<p class="empty">No bookings for this period.</p>'; return; }
-  const byDay = {};
-  items.forEach(r => (byDay[r.date] ||= []).push(r));
-  $('#list').innerHTML = Object.entries(byDay).map(([d, rs]) => {
-    const g = rs.filter(r => r.status !== 'cancelled' && r.status !== 'no-show').reduce((s,r) => s + Number(r.guests), 0);
-    return `<div class="day"><h2>${esc(niceDate(d))}${d === today ? ' · tonight' : ''}<small>${g} guests</small></h2>` +
-      rs.map(card).join('') + '</div>';
-  }).join('');
-}
-
-function card(r) {
-  const wa = waNumber(r.phone);
-  const msg = encodeURIComponent(`Hello ${r.name}, your table at Catch Marrakech for ${r.guests} on ${niceDate(r.date)} at ${r.time} is confirmed. See you soon! (Ref ${r.ref})`);
-  return `<div class="res ${esc(r.status)}">
-    <div><div class="t">${esc(r.time)}</div><div class="g">${esc(r.guests)} ${r.guests == 1 ? 'guest' : 'guests'}</div></div>
-    <div class="who">
-      <b>${esc(r.name)}</b><span class="badge ${esc(r.status)}">${esc(r.status)}</span>
-      <div><a href="tel:${esc(r.phone.replace(/[^\d+]/g,''))}">${esc(r.phone)}</a>${r.email ? ` · <a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` : ''}</div>
-      <div>Ref ${esc(r.ref)} · booked ${esc(new Date(r.createdAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))}</div>
-      ${r.notes ? `<div class="notes">${esc(r.notes)}</div>` : ''}
-    </div>
-    <div class="acts">
-      ${r.status === 'pending' ? `<button class="btn btn--sm btn--solid" data-ref="${esc(r.ref)}" data-set="confirmed">Confirm</button>` : ''}
-      <a class="btn btn--sm" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${msg}">WhatsApp</a>
-      <select data-ref="${esc(r.ref)}" aria-label="Status">
-        ${['pending','confirmed','seated','cancelled','no-show'].map(s => `<option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>`).join('')}
-      </select>
-    </div>
-  </div>`;
-}
-
-async function setStatus(ref, status) {
-  try {
-    const j = await api('POST', '', {ref, status});
-    lastItems = lastItems.map(r => r.ref === ref ? j.item : r);
-    render();
-  } catch (e) { alert(e.message); }
-}
-
-document.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-set]');
-  if (b) setStatus(b.dataset.ref, b.dataset.set);
-  const t = e.target.closest('#tabs button');
-  if (t) { range = t.dataset.r; $('#pick').value = ''; load(); }
-});
-document.addEventListener('change', (e) => {
-  if (e.target.matches('select[data-ref]')) setStatus(e.target.dataset.ref, e.target.value);
-  if (e.target.id === 'pick' && e.target.value) { range = e.target.value; load(); }
-});
-$('#refresh').onclick = load;
-$('#logout').onclick = logout;
-
-function logout() {
-  pass = ''; try { sessionStorage.removeItem(KEY); } catch (e) {}
-  $('#app').classList.add('hidden'); $('#login').classList.remove('hidden');
-}
-async function enter() {
-  try {
-    const j = await api('GET', '?from=2000-01-01&to=2000-01-01');
-    today = j.today;
-    try { sessionStorage.setItem(KEY, pass); } catch (e) {}
-    $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  // ---------- boot ----------
+  var channel = null, reloadT;
+  async function onSession(session) {
+    if (!session) {
+      me = null; role = null; $("#appView").hidden = true; $("#loginView").hidden = false;
+      if (channel) { try { sb.removeChannel(channel); } catch (e) {} channel = null; }
+      return;
+    }
+    if (me && me.id === session.user.id) return;
+    me = session.user;
+    var p = await sb.from("profiles").select("role").eq("user_id", me.id);
+    role = p.data && p.data[0] ? p.data[0].role : null;
+    if (!role) { $("#lErr").textContent = "This account has no access yet. Ask the owner."; $("#loginView").hidden = false; $("#appView").hidden = true; await sb.auth.signOut(); return; }
+    $("#loginView").hidden = true; $("#appView").hidden = false;
     load();
-  } catch (e) {
-    $('#login-err').textContent = e.message;
-    $('#login').classList.remove('hidden'); $('#app').classList.add('hidden');
+    if (!channel && sb.channel) { try { channel = sb.channel("catch-bookings").on("postgres_changes", { event: "*", schema: "public", table: "reservations" }, function () { clearTimeout(reloadT); reloadT = setTimeout(load, 500); }).subscribe(); } catch (e) {} }
   }
-}
-$('#login-form').onsubmit = (e) => { e.preventDefault(); pass = $('#pw').value; $('#login-err').textContent = ''; enter(); };
-if (pass) enter();
-// auto-refresh every 2 minutes while open
-setInterval(() => { if (pass && !document.hidden) load(); }, 120000);
+  async function boot() {
+    var cfg = await (await fetch("/gestion/config.json", { cache: "no-store" })).json();
+    sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "catch-bookings-auth" } });
+    var r = await sb.auth.getSession(); await onSession(r.data && r.data.session);
+    sb.auth.onAuthStateChange(function (_e, s) { onSession(s); });
+    setInterval(function () { if (me && !document.hidden && range !== "guests") load(); }, 60000);
+  }
+  boot().catch(function (e) { console.error(e); document.body.insertAdjacentHTML("beforeend", '<p class="empty">Could not start: ' + esc(e.message || e) + "</p>"); });
+})();
 </script>
 </body>
 </html>
