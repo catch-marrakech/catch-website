@@ -1,5 +1,21 @@
-// POST /api/reserve — create a reservation request.
-const { redis, serviceToday, addDays, slotMinutes, score, json, clean, newRef, notify } = require('./_lib');
+// POST /api/reserve — create a reservation request from the website.
+// Saves into Catch's Supabase through the create_reservation() function, which also links the booking
+// to the guest's profile (matched by phone number).
+const { redis, serviceToday, addDays, slotMinutes, json, clean, newRef, notify } = require('./_lib');
+const cfg = require('../gestion/config.json');
+
+async function supabaseReserve(args) {
+  const url = (process.env.SUPABASE_URL || cfg.supabaseUrl).replace(/\/$/, '');
+  const key = process.env.SUPABASE_ANON_KEY || cfg.supabaseKey;
+  const r = await fetch(url + '/rest/v1/rpc/create_reservation', {
+    method: 'POST',
+    headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify(args),
+  });
+  const body = await r.json().catch(() => null);
+  if (!r.ok) throw new Error('SUPABASE ' + r.status + ' ' + JSON.stringify(body));
+  return body; // the reference, e.g. "C-AB12CD"
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method not allowed' });
@@ -29,22 +45,17 @@ module.exports = async (req, res) => {
   if (date < today.date || date > addDays(today.date, 90)) return json(res, 400, { error: 'Please choose a date within the next 90 days.' });
   if (date === today.date && mins < today.minutes + 30) return json(res, 400, { error: 'That time has passed. Please choose a later time.' });
 
+  // Simple rate limit: 8 bookings per IP per hour (skipped if the rate-limit store is unavailable).
   try {
-    // Simple rate limit: 8 bookings per IP per hour.
     const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
     const [count] = await redis([['INCR', 'rl:' + ip], ['EXPIRE', 'rl:' + ip, 3600]]);
     if (count > 8) return json(res, 429, { error: 'Too many requests. Please try again later or message us on Instagram.' });
+  } catch (e) {
+    console.error('rate limit unavailable', e.message);
+  }
 
-    const ref = newRef();
-    const item = {
-      ref, date, time, guests, name, phone, email, notes,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    };
-    await redis([
-      ['SET', 'res:' + ref, JSON.stringify(item)],
-      ['ZADD', 'res:index', score(date, mins), ref],
-    ]);
+  try {
+    const ref = await supabaseReserve({ p_date: date, p_time: time, p_guests: guests, p_name: name, p_phone: phone, p_email: email || null, p_notes: notes || null });
 
     await notify(
       `New booking ${ref}: ${guests} guests, ${date} ${time}`,
@@ -66,9 +77,6 @@ module.exports = async (req, res) => {
     return json(res, 200, { ok: true, ref });
   } catch (e) {
     console.error(e);
-    if (String(e.message).startsWith('DB_NOT_CONFIGURED')) {
-      return json(res, 503, { error: 'Online booking is not available yet. Please message us on Instagram @catchmarrakech.' });
-    }
     return json(res, 500, { error: 'Could not save your booking. Please try again or message us on Instagram.' });
   }
 };
