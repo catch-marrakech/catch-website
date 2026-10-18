@@ -42,6 +42,10 @@ img{display:block;max-width:100%}
 .nav .logo{width:92px}
 .nav__right{display:flex;align-items:center;gap:14px}
 .nav__right .btn{padding:9px 16px;font-size:11px}
+.lang{display:flex;align-items:center;height:44px;border:1px solid var(--line)}
+.lang a{display:flex;align-items:center;height:100%;padding:0 10px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--muted)}
+.lang a[aria-current]{color:var(--black);background:var(--oak)}
+.lang a:not([aria-current]):hover{color:var(--oak)}
 .burger{width:44px;height:44px;display:grid;place-content:center;gap:6px;background:none;border:1px solid var(--line);cursor:pointer}
 .burger i{display:block;width:20px;height:1px;background:var(--cream);transition:transform .3s,opacity .3s}
 .menu-open .burger i:nth-child(1){transform:translateY(3.5px) rotate(45deg)}
