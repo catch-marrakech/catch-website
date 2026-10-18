@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La carte · Catch Marrakech</title>
+<meta name="description" content="La carte de Catch Marrakech, cuisine asiatique fusion à Marrakech : entrées, plats, desserts et boissons.">
+<link rel="canonical" href="https://www.catchmarrakech.com/fr/menu">
+<link rel="alternate" hreflang="en" href="https://www.catchmarrakech.com/menu">
+<link rel="alternate" hreflang="fr" href="https://www.catchmarrakech.com/fr/menu">
+<link rel="alternate" hreflang="x-default" href="https://www.catchmarrakech.com/menu">
+<link rel="icon" type="image/png" href="/icon.png">
+<meta property="og:title" content="La carte · Catch Marrakech">
+<meta property="og:description" content="Là où les saveurs d’Asie rencontrent les nuits de Marrakech.">
+<meta property="og:image" content="https://www.catchmarrakech.com/og.jpg">
+<meta name="theme-color" content="#0a0807">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="nav solid" id="nav">
+  <a href="/fr" aria-label="Accueil Catch Marrakech"><span class="logo" role="img" aria-label="Catch Marrakech"></span></a>
+  <div class="nav__right">
+    <div class="lang"><a href="/menu" lang="en" hreflang="en">EN</a><a href="/fr/menu" aria-current="true">FR</a></div>
+    <a class="btn" href="/fr#reserve">Réserver</a>
+    <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="drawer"><i></i><i></i></button>
+  </div>
+</header>
+<nav class="drawer" id="drawer" aria-hidden="true">
+  <div>
+    <ul>
+      <li><a href="/fr">Accueil</a></li>
+      <li><a href="/fr/menu" aria-current="page">La carte</a></li>
+      <li><a href="/fr#reserve">Réserver une table</a></li>
+      <li><a href="/fr#visit">Nous trouver</a></li>
+      <li><a href="https://www.instagram.com/catchmarrakech/" target="_blank" rel="noopener">Instagram</a></li>
+    </ul>
+    <small>Tous les soirs 18h – 2h</small>
+  </div>
+</nav>
+
+<main>
+  <section class="page-head">
+    <p class="eyebrow">Catch Marrakech</p>
+    <h2>La <em>carte.</em></h2>
+    <p class="lead" style="margin-inline:auto">Choisissez une catégorie.</p>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="cats" id="cats"></div>
+    <div class="menu-cta"><a class="btn btn--solid" href="/fr#reserve">Réserver une table</a></div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <span class="logo" role="img" aria-label="Catch Marrakech"></span>
+    <nav><a href="/fr/menu">La carte</a><a href="/fr#reserve">Réserver</a><a href="https://maps.app.goo.gl/BqxYbUBCXpp8ehJy6" target="_blank" rel="noopener">Plan</a><a href="https://www.instagram.com/catchmarrakech/" target="_blank" rel="noopener">Instagram</a><a href="mailto:info@catchmarrakech.com">info@catchmarrakech.com</a></nav>
+    <p>Imili 2, R. Brada, IM B MAG 3 · 40000 Marrakech<br>© <span id="year">2026</span> Catch Marrakech</p>
+  </div>
+</footer>
+
+<script src="/site.js" defer></script>
+<script>
+  // ===== MENU CONTENT =====
+  // Add dishes to a category like this:
+  //   { name: "Dish name", price: "120", text: "Short description" }
+  // Categories can be added, removed or renamed. An empty list shows "Coming soon".
+  var MENU = [
+    { id: "starters", title: "Entrées", items: [] },
+    { id: "mains", title: "Plats", items: [] },
+    { id: "desserts", title: "Desserts", items: [] },
+    { id: "drinks", title: "Boissons", items: [] }
+  ];
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  var box = document.getElementById("cats");
+  box.innerHTML = MENU.map(function (c) {
+    var items = c.items.length
+      ? c.items.map(function (i) { return '<div class="item"><b>' + esc(i.name) + "</b>" + (i.price ? "<em>" + esc(i.price) + " DH</em>" : "<span></span>") + (i.text ? "<p>" + esc(i.text) + "</p>" : "") + "</div>"; }).join("")
+      : '<p class="soon">Bientôt disponible</p>';
+    return '<div class="cat" id="' + c.id + '"><button type="button" aria-expanded="false" aria-controls="items-' + c.id + '"><span>' + esc(c.title) + "</span><small>" + (c.items.length ? c.items.length + " plats" : "Bientôt") + '</small><i aria-hidden="true"></i></button><div class="cat__items" id="items-' + c.id + '">' + items + "</div></div>";
+  }).join("");
+  function openCat(el, open) { el.classList.toggle("open", open); el.querySelector("button").setAttribute("aria-expanded", open ? "true" : "false"); }
+  box.addEventListener("click", function (e) {
+    var b = e.target.closest(".cat > button"); if (!b) return;
+    var cat = b.parentNode, open = !cat.classList.contains("open");
+    openCat(cat, open);
+    if (open) history.replaceState(null, "", "#" + cat.id);
+  });
+  var start = location.hash && document.getElementById(location.hash.slice(1));
+  if (start && start.classList.contains("cat")) openCat(start, true);
+</script>
+</body>
+</html>

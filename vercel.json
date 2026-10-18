@@ -1,14 +1,59 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/admin", "destination": "/bookings", "permanent": false }
+    {
+      "source": "/admin",
+      "destination": "/bookings",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/", "has": [{ "type": "host", "value": "gestion.catchmarrakech.com" }], "destination": "/gestion/index.html" }
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "gestion.catchmarrakech.com"
+        }
+      ],
+      "destination": "/gestion/index.html"
+    },
+    {
+      "source": "/fr/menu",
+      "destination": "/fr-menu.html"
+    }
   ],
   "headers": [
-    { "source": "/bookings", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
-    { "source": "/gestion/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }, { "key": "Cache-Control", "value": "no-cache" }] },
-    { "source": "/api/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+    {
+      "source": "/bookings",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/gestion/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }
